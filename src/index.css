@@ -247,10 +247,35 @@ body {
   box-shadow: 0 0 15px var(--accent-glow);
 }
 
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .avatar {
   width: 28px;
   height: 28px;
   border-radius: 50%;
   border: 2px solid var(--bg-card);
   margin-left: -8px;
+}
+
+.glass-panel {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: 12px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.glass-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  transition: all 0.2s;
+}
+
+.glass-card:hover {
+  border-color: var(--border-focus);
+  background: var(--bg-card-hover);
 }

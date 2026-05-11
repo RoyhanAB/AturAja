@@ -10,7 +10,10 @@ CREATE TABLE public.tasks (
     priority TEXT DEFAULT 'Medium',
     tags TEXT[] DEFAULT '{}',
     column_id TEXT DEFAULT 'column-1',
-    position NUMERIC DEFAULT 0
+    position NUMERIC DEFAULT 0,
+    due_date DATE,
+    archived BOOLEAN DEFAULT false,
+    archived_at TIMESTAMP WITH TIME ZONE
 );
 
 -- 2. Enable Row Level Security (RLS)

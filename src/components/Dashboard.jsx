@@ -6,8 +6,16 @@ const Dashboard = ({ data, userEmail }) => {
   const totalTasks = allTasks.length;
   const doneTasks = data.columns["column-4"].taskIds.length;
   const highPriority = allTasks.filter((t) => t.priority === "High").length;
+  
+  // Calculate overdue tasks
+  const overdueTasks = allTasks.filter((task) => {
+    if (!task.due_date) return false;
+    return new Date(task.due_date) < new Date() && task.column_id !== "column-4";
+  }).length;
 
-  const recentTasks = allTasks.slice(0, 3);
+  const recentTasks = allTasks
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    .slice(0, 5);
 
   return (
     <div style={{ padding: "32px", overflowY: "auto", height: "100%" }}>
@@ -141,6 +149,43 @@ const Dashboard = ({ data, userEmail }) => {
             <h3 style={{ fontSize: "24px" }}>{highPriority}</h3>
           </div>
         </div>
+
+        <div
+          className="glass-panel"
+          style={{
+            padding: "24px",
+            display: "flex",
+            alignItems: "center",
+            gap: "16px",
+          }}
+        >
+          <div
+            style={{
+              width: "48px",
+              height: "48px",
+              borderRadius: "12px",
+              background: overdueTasks > 0 ? "var(--priority-high-bg)" : "var(--priority-low-bg)",
+              color: overdueTasks > 0 ? "var(--priority-high)" : "var(--priority-low)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Clock size={24} />
+          </div>
+          <div>
+            <p
+              style={{
+                fontSize: "13px",
+                color: "var(--text-secondary)",
+                marginBottom: "4px",
+              }}
+            >
+              Tugas Terlambat
+            </p>
+            <h3 style={{ fontSize: "24px" }}>{overdueTasks}</h3>
+          </div>
+        </div>
       </div>
 
       <div>
@@ -190,14 +235,34 @@ const Dashboard = ({ data, userEmail }) => {
                     >
                       {task.content}
                     </p>
-                    <p
-                      style={{
-                        fontSize: "12px",
-                        color: "var(--text-secondary)",
-                      }}
-                    >
-                      Ditambahkan ke papan tugas
-                    </p>
+                    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+                      <p
+                        style={{
+                          fontSize: "12px",
+                          color: "var(--text-secondary)",
+                        }}
+                      >
+                        {data.columns[task.column_id]?.title || "Unknown"}
+                      </p>
+                      {task.due_date && (
+                        <>
+                          <span style={{ color: "var(--text-tertiary)" }}>•</span>
+                          <p
+                            style={{
+                              fontSize: "12px",
+                              color: new Date(task.due_date) < new Date() && task.column_id !== "column-4"
+                                ? "var(--priority-high)"
+                                : "var(--text-secondary)",
+                            }}
+                          >
+                            {new Date(task.due_date).toLocaleDateString("id-ID", {
+                              day: "numeric",
+                              month: "short",
+                            })}
+                          </p>
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
                 {task.priority && (

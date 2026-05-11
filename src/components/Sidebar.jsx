@@ -1,7 +1,7 @@
 import React from "react";
 import { LayoutDashboard, CheckSquare, Settings, PieChart } from "lucide-react";
 
-const Sidebar = ({ activeTab, setActiveTab }) => {
+const Sidebar = ({ activeTab, setActiveTab, stats }) => {
   return (
     <div className="sidebar">
       <div
@@ -57,6 +57,21 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       >
         <CheckSquare size={18} />
         <span>Papan Kanban</span>
+        {stats && stats.totalTasks > 0 && (
+          <span
+            style={{
+              marginLeft: "auto",
+              background: "var(--accent)",
+              color: "white",
+              padding: "2px 8px",
+              borderRadius: "10px",
+              fontSize: "11px",
+              fontWeight: "600",
+            }}
+          >
+            {stats.totalTasks}
+          </span>
+        )}
       </div>
       <div
         className={`nav-item ${activeTab === "analytics" ? "active" : ""}`}
@@ -65,6 +80,34 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
         <PieChart size={18} />
         <span>Analitik</span>
       </div>
+
+      {stats && stats.overdueTasks > 0 && (
+        <div
+          style={{
+            margin: "16px 14px",
+            padding: "12px",
+            background: "var(--priority-high-bg)",
+            border: "1px solid var(--priority-high)",
+            borderRadius: "8px",
+          }}
+        >
+          <div
+            style={{
+              fontSize: "11px",
+              color: "var(--priority-high)",
+              fontWeight: "600",
+              textTransform: "uppercase",
+              letterSpacing: "0.5px",
+              marginBottom: "6px",
+            }}
+          >
+            ⚠️ Perhatian
+          </div>
+          <div style={{ fontSize: "13px", color: "var(--text-primary)" }}>
+            {stats.overdueTasks} tugas terlambat
+          </div>
+        </div>
+      )}
 
       <div style={{ marginTop: "auto" }}>
         <div

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { X } from "lucide-react";
+import { X, Calendar } from "lucide-react";
 
 const Modal = ({ onClose, onSave, initialData }) => {
   const [content, setContent] = useState(
@@ -14,6 +14,9 @@ const Modal = ({ onClose, onSave, initialData }) => {
   const [tagsInput, setTagsInput] = useState(
     initialData && initialData.tags ? initialData.tags.join(", ") : "",
   );
+  const [dueDate, setDueDate] = useState(
+    initialData && initialData.due_date ? initialData.due_date : "",
+  );
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -24,19 +27,12 @@ const Modal = ({ onClose, onSave, initialData }) => {
       .map((t) => t.trim())
       .filter((t) => t.length > 0);
 
-    // Format date for mock
-    const today = new Date();
-    const dueDate = today.toLocaleDateString("id-ID", {
-      month: "short",
-      day: "numeric",
-    });
-
     onSave({
       content,
       description,
       priority,
       tags,
-      dueDate,
+      due_date: dueDate || null,
     });
   };
 
@@ -219,6 +215,37 @@ const Modal = ({ onClose, onSave, initialData }) => {
                 }}
               />
             </div>
+          </div>
+
+          <div>
+            <label
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginBottom: "8px",
+                fontSize: "13px",
+                color: "var(--text-secondary)",
+              }}
+            >
+              <Calendar size={14} />
+              Batas Waktu
+            </label>
+            <input
+              type="date"
+              value={dueDate}
+              onChange={(e) => setDueDate(e.target.value)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                background: "var(--bg-app)",
+                border: "1px solid var(--border-light)",
+                borderRadius: "6px",
+                color: "white",
+                outline: "none",
+                colorScheme: "dark",
+              }}
+            />
           </div>
 
           <div

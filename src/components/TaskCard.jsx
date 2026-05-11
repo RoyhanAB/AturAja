@@ -113,20 +113,43 @@ const TaskCard = ({ task, index, deleteTask, onEditTask, columnId }) => {
               paddingTop: "12px",
             }}
           >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "6px",
-                color: "var(--text-tertiary)",
-                fontSize: "12px",
-                fontWeight: "500",
-              }}
-            >
-              <Clock size={14} />
-              <span>{task.dueDate || "Batas waktu tidak ada"}</span>
-            </div>
-            {/* Avatar dihapus agar lebih bersih dan fokus pada manajemen tugas pribadi */}
+            {task.due_date ? (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color: new Date(task.due_date) < new Date() 
+                    ? "var(--priority-high)" 
+                    : "var(--text-tertiary)",
+                  fontSize: "12px",
+                  fontWeight: "500",
+                }}
+              >
+                <Clock size={14} />
+                <span>
+                  {new Date(task.due_date).toLocaleDateString("id-ID", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
+              </div>
+            ) : (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  color: "var(--text-tertiary)",
+                  fontSize: "12px",
+                  fontWeight: "500",
+                }}
+              >
+                <Clock size={14} />
+                <span>Tidak ada deadline</span>
+              </div>
+            )}
           </div>
         </div>
       )}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Sidebar from "./components/Sidebar";
 import Topbar from "./components/Topbar";
 import Board from "./components/Board";
@@ -7,6 +7,9 @@ import Dashboard from "./components/Dashboard";
 import Settings from "./components/Settings";
 import Modal from "./components/Modal";
 import Login from "./components/Login";
+import FilterSort from "./components/FilterSort";
+import KeyboardShortcuts from "./components/KeyboardShortcuts";
+import ExportData from "./components/ExportData";
 import { supabase } from "./supabaseClient";
 import { Toaster, toast } from "react-hot-toast";
 
@@ -45,6 +48,14 @@ function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
+  const searchInputRef = useRef(null);
+
+  const [filters, setFilters] = useState({
+    priorities: [],
+    tags: [],
+    sortBy: "position",
+    showOverdue: false,
+  });
 
   const [data, setData] = useState({
     tasks: {},
@@ -105,6 +116,7 @@ function App() {
       tags: newTaskData.tags,
       column_id: firstColumnId,
       position: position,
+      due_date: newTaskData.due_date,
     };
 
     const { data: insertedTask, error } = await supabase
@@ -142,6 +154,7 @@ function App() {
         description: updatedData.description,
         priority: updatedData.priority,
         tags: updatedData.tags,
+        due_date: updatedData.due_date,
       })
       .eq("id", editingTask.id)
       .select()
@@ -274,6 +287,28 @@ function App() {
     await supabase.auth.signOut();
   };
 
+  const setSearchFocus = () => {
+    if (searchInputRef.current) {
+      searchInputRef.current.focus();
+    }
+  };
+
+  // Get all unique tags from tasks
+  const allTags = [
+    ...new Set(
+      Object.values(data.tasks).flatMap((task) => task.tags || [])
+    ),
+  ];
+
+  // Calculate stats for sidebar
+  const stats = {
+    totalTasks: Object.values(data.tasks).length,
+    overdueTasks: Object.values(data.tasks).filter((task) => {
+      if (!task.due_date) return false;
+      return new Date(task.due_date) < new Date() && task.column_id !== "column-4";
+    }).length,
+  };
+
   if (loadingSession) {
     return (
       <div
@@ -305,6 +340,7 @@ function App() {
             handleDragEnd={handleDragEnd}
             handleDeleteTask={handleDeleteTask}
             searchQuery={searchQuery}
+            filters={filters}
             onOpenModal={openNewTaskModal}
             onEditTask={openEditTaskModal}
           />
@@ -322,6 +358,7 @@ function App() {
             handleDragEnd={handleDragEnd}
             handleDeleteTask={handleDeleteTask}
             searchQuery={searchQuery}
+            filters={filters}
             onOpenModal={openNewTaskModal}
             onEditTask={openEditTaskModal}
           />
@@ -333,7 +370,7 @@ function App() {
     <>
       <div className="app-background"></div>
       <div className="layout-container">
-        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} stats={stats} />
         <div className="main-content">
           <Topbar
             searchQuery={searchQuery}
@@ -341,7 +378,29 @@ function App() {
             onOpenModal={openNewTaskModal}
             userEmail={session.user.email}
             setActiveTab={setActiveTab}
+            searchInputRef={searchInputRef}
           />
+          <div
+            style={{
+              display: "flex",
+              gap: "12px",
+              padding: "16px 32px",
+              borderBottom: "1px solid var(--border-light)",
+              background: "var(--bg-sidebar)",
+            }}
+          >
+            <FilterSort
+              filters={filters}
+              setFilters={setFilters}
+              allTags={allTags}
+            />
+            <ExportData data={data} />
+            <KeyboardShortcuts
+              onNewTask={openNewTaskModal}
+              setActiveTab={setActiveTab}
+              setSearchFocus={setSearchFocus}
+            />
+          </div>
           {renderContent()}
         </div>
       </div>

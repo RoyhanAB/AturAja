@@ -7,6 +7,7 @@ const Topbar = ({
   onOpenModal,
   userEmail,
   setActiveTab,
+  searchInputRef,
 }) => {
   const initial = userEmail ? userEmail.charAt(0).toUpperCase() : "?";
 
@@ -42,6 +43,7 @@ const Topbar = ({
             }}
           />
           <input
+            ref={searchInputRef}
             type="text"
             placeholder="Cari tugas..."
             value={searchQuery}
